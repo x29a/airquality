@@ -11,7 +11,7 @@ Copy the `config_example.h` to `config.h` and fill out the values.
 # Building
 In Arduino IDE select the ESP board under Tools:
 
-* Board: NodeMCU 1.0 (ESP-12E)
+* Board: NodeMCU 1.0 (ESP-12E) or WEMOS D1 Mini
 * CPU frq 80 MHz
 * Flash Size: 1M (256K SPIFFS)
 * Flash Mode: DOUT
