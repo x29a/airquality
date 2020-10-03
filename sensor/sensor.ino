@@ -165,6 +165,9 @@ int send_data_to_server()
 
 void setup()
 {
+  // setup i2c with specific pins
+  Wire.begin(sdaPin, sclPin);
+
   Serial.begin(115200);
   Serial.println("SGP30 test");
 
