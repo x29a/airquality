@@ -173,7 +173,7 @@ void setup()
 
   if (!sgp.begin())
   {
-    Serial.println("Sensor not found :(");
+    Serial.println("SGP30 not found :(");
     delay(10000);
     ESP.restart();
   }
@@ -184,6 +184,8 @@ void setup()
   Serial.println(sgp.serialnumber[2], HEX);
 
   sht31_available = sht31.begin(0x44);
+  Serial.print("SHT31 available: ");
+  Serial.println(sht31_available);
 
   // start the file system
   SPIFFS.begin();
