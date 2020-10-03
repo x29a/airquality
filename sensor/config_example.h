@@ -17,6 +17,10 @@ String endpointUrl = "/airquality/api/";
 
 String endpointAddress = endpointProto + endpointHost + ":" + endpointPort + endpointUrl;
 
+// i2c pins - default for D1 Mini
+const int sclPin = D1;
+const int sdaPin = D2;
+
 // ADVANCED SETTINGS - THE DEFAULTS ARE PROBABLY OK
 // number of seconds before starting a new measurement (should be 1Hz)
 #define MEASUREMENT_DELAY 1
