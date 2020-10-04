@@ -97,6 +97,7 @@ void handle_status()
 
   String response;
 
+  response += "id=\"" + unitId + "\"\n";
   response += "uptime=\"" + String(now) + "\"\n";
   response += "free heap=\"" + String(ESP.getFreeHeap()) + "\"\n";
 
