@@ -21,6 +21,10 @@ bool sht31_available = false;
 #include <Homie.h>
 #endif //BACKEND_HOMIE
 
+#ifdef OUTPUT_LEDS
+#include <Adafruit_NeoPixel.h>
+#endif //OUTPUT_LEDS
+
 // timestamp of last measurement in seconds
 unsigned long int last_measurement = 0;
 
@@ -47,6 +51,10 @@ ESP8266HTTPUpdateServer httpUpdater;
 #ifdef BACKEND_HOMIE
 HomieNode homieNode("airquality", "AirQuality", "airquality");
 #endif //BACKEND_HOMIE
+
+#ifdef OUTPUT_LEDS
+Adafruit_NeoPixel leds(LEDS_NUMPIXELS, LEDS_PIN, NEO_GRB + NEO_KHZ800);
+#endif OUTPUT_LEDS
 
 #ifdef BACKEND_HOMIE
 void homieLoopHandler() {
@@ -193,6 +201,33 @@ int send_data_to_server()
 }
 #endif //BACKEND_HTTP
 
+#ifdef OUTPUT_LEDS
+void update_leds(const unsigned long & eco2)
+{
+    // Update the PIXELS
+    auto newPixelColor = LEDS_COLOR_GREEN;
+    if (current_eco2 >= LEDS_THRESHOLD_YELLOW)
+    {
+      newPixelColor = LEDS_COLOR_YELLOW;
+    }
+    if (current_eco2 >= LEDS_THRESHOLD_RED)
+    {
+      newPixelColor = LEDS_COLOR_RED;
+    }
+
+    // compute where in the range from MINVAL to MAXVAL the level is
+    float ledFillFactor = static_cast<float>(eco2 - LEDS_MINVAL) / (LEDS_MAXVAL - LEDS_MINVAL);
+    // clamp it if it exceeds the selected range
+    ledFillFactor = min(max(ledFillFactor, 0.0f), 1.0f);
+
+    // compute how many LEDs to turn on, this keeps at least one lit, as confirmation of operation
+    uint16_t numPixelsToFill = static_cast<uint16_t>(1 + ledFillFactor * (leds.numPixels() - 1));
+    leds.clear();
+    leds.fill(newPixelColor, 0, numPixelsToFill);
+    leds.show();
+}
+#endif //OUTPUT_LEDS
+
 void setup()
 {
   // setup i2c with specific pins
@@ -201,6 +236,11 @@ void setup()
   Serial.begin(115200);
   Serial.println("SGP30 test");
 
+#ifdef OUTPUT_LEDS
+  leds.begin();
+  leds.clear();
+#endif //OUTPUT_LEDS
+  
   if (!sgp.begin())
   {
     Serial.println("SGP30 not found :(");
@@ -404,6 +444,10 @@ void loop()
       }
     }
 #endif //BACKEND_HTTP
+
+#ifdef OUTPUT_LEDS
+    update_leds(current_eco2);
+#endif //OUTPUT_LEDS
 
     // difference between baselines in seconds
     const unsigned long time_diff_baseline = now - last_baseline;

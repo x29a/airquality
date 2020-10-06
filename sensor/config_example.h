@@ -3,6 +3,8 @@
 #undef BACKEND_HOMIE
 // Upload the measurements via HTTP POSE to server
 #define BACKEND_HTTP
+// Show the current CO2 measurement on a LED strip (NeoPixel/WS2811/WS2812)
+#define OUTPUT_LEDS
 
 // i2c pins - default for D1 Mini
 const int sclPin = D1;
@@ -33,6 +35,20 @@ const int sdaPin = D2;
 // No settings for BACKEND_HOMIE required, see Hoie docs for config instructions
 //  https://homieiot.github.io/homie-esp8266/docs/2.0.0/configuration/http-json-api/
 //  https://homieiot.github.io/homie-esp8266/docs/3.0.0/configuration/json-configuration-file/
+
+// SETTINGS FOR THE LED OUTPUT
+#ifdef OUTPUT_LEDS
+  #define LEDS_PIN 14 //= D5 on WeeMos D1 Mini, you can use virtually any pin!
+  #define LEDS_NUMPIXELS 24
+  #define LEDS_COLOR_GREEN Adafruit_NeoPixel::Color(0, 25, 0) // r = 0, g = 25, b = 0; each of 255 max!
+  #define LEDS_COLOR_YELLOW Adafruit_NeoPixel::Color(75, 75, 0) // r = 75, g = 75, b = 0; Make it a bit more noticable
+  #define LEDS_COLOR_RED Adafruit_NeoPixel::Color(255, 0, 0) // r = 255, g = 0, b = 0; No time to be subtle, make it shine!
+  
+  #define LEDS_THRESHOLD_YELLOW 800 // [ppm]
+  #define LEDS_THRESHOLD_RED 1000 // [ppm]
+  #define LEDS_MINVAL 300 // [ppm]
+  #define LEDS_MAXVAL 1200 // [ppm]
+#endif //OUTPUT_LEDS
 
 // ADVANCED SETTINGS - THE DEFAULTS ARE PROBABLY OK
 // number of seconds before starting a new measurement (should be 1Hz)

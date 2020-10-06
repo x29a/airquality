@@ -23,6 +23,9 @@ For Homie release 3.0.0:
 > 
 > Some of them are available through the Arduino IDE, with Sketch → Include Library → Manage Libraries. For the others, install it by downloading the .zip on GitHub.
 
+# Additional Dependencies - LED Output
+The output to LEDs only requires the "Adafruit_NeoPixel", which you can install from the Arduino Library Manager.
+
 # Configuration
 Copy the `config_example.h` to `config.h` and fill out the values.
 
