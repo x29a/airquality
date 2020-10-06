@@ -1,3 +1,5 @@
+#include "config_example.h"
+
 #include <FS.h>
 #include <Wire.h>
 
@@ -8,15 +10,16 @@ Adafruit_SGP30 sgp;
 Adafruit_SHT31 sht31;
 bool sht31_available = false;
 
+#ifdef BACKEND_HTTP
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-ESP8266WebServer server(80);
 #include <ESP8266HTTPUpdateServer.h>
-ESP8266HTTPUpdateServer httpUpdater;
 #include <ESP8266HTTPClient.h>
+#endif //BACKEND_HTTP
 
-#include "config.h"
-
+#ifdef BACKEND_HOMIE
+#include <Homie.h>
+#endif //BACKEND_HOMIE
 
 // timestamp of last measurement in seconds
 unsigned long int last_measurement = 0;
@@ -36,6 +39,30 @@ float current_temp = 0;
 float current_relhum = 0;
 unsigned long current_abshum = 0;
 
+#ifdef BACKEND_HTTP
+ESP8266WebServer server(80);
+ESP8266HTTPUpdateServer httpUpdater;
+#endif //BACKEND_HTTP
+
+#ifdef BACKEND_HOMIE
+HomieNode homieNode("airquality", "AirQuality", "airquality");
+#endif //BACKEND_HOMIE
+
+#ifdef BACKEND_HOMIE
+void homieLoopHandler() {
+  if (millis() - last_upload >= UPLOAD_DELAY * 1000UL || last_upload == 0) {
+    homieNode.setProperty("eco2").send(String(current_eco2));
+    homieNode.setProperty("relHumidity").send(String(current_relhum));
+    homieNode.setProperty("absHumidity").send(String(current_abshum));
+    homieNode.setProperty("tvoc").send(String(current_tvoc));
+    homieNode.setProperty("rawH2").send(String(current_rawh2));
+    homieNode.setProperty("rawEth").send(String(current_raweth));
+    
+    last_upload = millis();
+  }
+}
+#endif BACKEND_HOMIE
+
 
 /* return absolute humidity [mg/m^3] with approximation formula
   @param temperature [°C]
@@ -49,6 +76,7 @@ uint32_t getAbsoluteHumidity(float temperature, float humidity)
   return absoluteHumidityScaled;
 }
 
+#ifdef BACKEND_HTTP
 /* check and wait for Wifi state WL_CONNECTED
   @param timeOutSec [s]
 */
@@ -163,12 +191,13 @@ int send_data_to_server()
 
   return 1;
 }
+#endif //BACKEND_HTTP
 
 void setup()
 {
   // setup i2c with specific pins
   Wire.begin(sdaPin, sclPin);
-
+  
   Serial.begin(115200);
   Serial.println("SGP30 test");
 
@@ -219,6 +248,7 @@ void setup()
     delay(1000);
   }
 
+#ifdef BACKEND_HTTP
   WiFi.mode(WIFI_STA);
   WiFi.begin(wifi_ssid, wifi_passwort);
 
@@ -243,10 +273,38 @@ void setup()
   {
     last_upload = millis() / 1000.0;
   }
+#endif //BACKEND_HTTP
+
+#ifdef BACKEND_HOMIE
+  Homie_setFirmware("sgp30-sensor", "1.0.0");
+  Homie.setLoopFunction(homieLoopHandler);
+
+  homieNode.advertise("temperature").setName("Temperature")
+                                      .setDatatype("float")
+                                      .setUnit("ºC");
+  homieNode.advertise("eco2").setName("eCO2")
+                                      .setDatatype("float")
+                                      .setUnit("ppm");
+  homieNode.advertise("relHumidity").setName("Relative Humidity")
+                                      .setDatatype("float")
+                                      .setUnit("%");
+  homieNode.advertise("absHumidity").setName("Absolute Humidity")
+                                      .setDatatype("float")
+                                      .setUnit("mg/m^3");
+  homieNode.advertise("tvoc").setName("TVOC")
+                                      .setDatatype("float")
+                                      .setUnit("ppb");
+  homieNode.advertise("rawH2").setName("Raw H2")
+                                      .setDatatype("float");
+  homieNode.advertise("rawEth").setName("Raw Ethanol")
+                                      .setDatatype("float");
+  Homie.setup();
+#endif //BACKEND_HOMIE
 }
 
 void loop()
 {
+#ifdef BACKEND_HTTP
   server.handleClient();
 
   if (!isConnected(10))
@@ -255,7 +313,12 @@ void loop()
     delay(200);
     ESP.restart();
   }
+#endif //BACKEND_HTTP
 
+#ifdef BACKEND_HOMIE
+  Homie.loop();
+#endif
+  
   // current timestamp in seconds
   const unsigned long now = millis() / 1000.0;
 
@@ -314,7 +377,10 @@ void loop()
         Serial.println("softreset command failed or no effect, restarting MCU");
         ESP.restart();
       }
-      delay(5000);
+      // can't do long delays with the wifi enabled, 
+      // so just make sure we wait long enough (5s) before the next measurement
+      last_measurement = now + 5;
+      return;
     }
 
     // got valid readings, mark this as last measurement
@@ -324,6 +390,7 @@ void loop()
     current_rawh2 = sgp.rawH2;
     current_raweth = sgp.rawEthanol;
 
+#ifdef BACKEND_HTTP
     // difference between uploads in seconds
     const unsigned long time_diff_upload = now - last_upload;
 
@@ -336,6 +403,7 @@ void loop()
         last_upload = now;
       }
     }
+#endif //BACKEND_HTTP
 
     // difference between baselines in seconds
     const unsigned long time_diff_baseline = now - last_baseline;
