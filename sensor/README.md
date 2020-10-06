@@ -5,6 +5,9 @@ Then go to Tools -> Manage Libraries and install the following libraries:
 * Adafruit SGP30 Library, Version 1.2.2
 * Adafruit SHT31 Library, Version 1.2.0 (not 2.x.x)
 
+# Additional Dependencies - LED Output
+The output to LEDs only requires the "Adafruit_NeoPixel", which you can install from the Arduino Library Manager.
+
 # Configuration
 Copy the `config_example.h` to `config.h` and fill out the values.
 
