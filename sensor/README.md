@@ -11,14 +11,15 @@ Add the libraries listed in the Homie "Getting started" guide, e.g. 1a.: https:/
 For Homie release 3.0.0:
 
 > Download Homie relase 3.0.0 https://github.com/homieiot/homie-esp8266/releases/tag/v3.0.0
+> 
 > Load the .zip with Sketch → Include Library → Add .ZIP Library
 > 
 > Add the Homie dependencies:
-> ArduinoJson >= 5.0.8 https://github.com/bblanchon/ArduinoJson
-> Bounce2 https://github.com/thomasfredericks/Bounce2
-> ESPAsyncTCP >= c8ed544 https://github.com/me-no-dev/ESPAsyncTCP
-> AsyncMqttClient https://github.com/marvinroger/async-mqtt-client
-> ESPAsyncWebServer https://github.com/me-no-dev/ESPAsyncWebServer
+> * ArduinoJson >= 5.0.8 https://github.com/bblanchon/ArduinoJson
+> * Bounce2 https://github.com/thomasfredericks/Bounce2
+> * ESPAsyncTCP >= c8ed544 https://github.com/me-no-dev/ESPAsyncTCP
+> * AsyncMqttClient https://github.com/marvinroger/async-mqtt-client
+> * ESPAsyncWebServer https://github.com/me-no-dev/ESPAsyncWebServer
 > 
 > Some of them are available through the Arduino IDE, with Sketch → Include Library → Manage Libraries. For the others, install it by downloading the .zip on GitHub.
 
