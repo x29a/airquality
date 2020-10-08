@@ -188,7 +188,7 @@ void update_leds(const unsigned long & eco2)
     // compute where in the range from MINVAL to MAXVAL the level is
     float ledFillFactor = static_cast<float>(eco2 - LEDS_MINVAL) / (LEDS_MAXVAL - LEDS_MINVAL);
     // clamp it if it exceeds the selected range
-    ledFillFactor = min(max(ledFillFactor, 0.0f), 1.0f);
+    ledFillFactor = _min(_max(ledFillFactor, 0.0f), 1.0f);
 
     // compute how many LEDs to turn on, this keeps at least one lit, as confirmation of operation
     uint16_t numPixelsToFill = static_cast<uint16_t>(1 + ledFillFactor * (leds.numPixels() - 1));
