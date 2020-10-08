@@ -40,9 +40,6 @@ float current_temp = 0;
 float current_relhum = 0;
 unsigned long current_abshum = 0;
 
-ESP8266WebServer server(80);
-ESP8266HTTPUpdateServer httpUpdater;
-
 #ifdef OUTPUT_LEDS
 Adafruit_NeoPixel leds(LEDS_NUMPIXELS, LEDS_PIN, NEO_GRB + NEO_KHZ800);
 #endif OUTPUT_LEDS
