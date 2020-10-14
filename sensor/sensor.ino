@@ -117,6 +117,7 @@ void handle_status()
 // webserver restart handler - performs mc restart
 void handle_restart()
 {
+  server.send(200, "text/plain", "restart initiated");
   ESP.restart();
 }
 
@@ -208,7 +209,6 @@ void setup()
   Wire.begin(sdaPin, sclPin);
 
   Serial.begin(115200);
-  Serial.println("SGP30 test");
 
 #ifdef OUTPUT_LEDS
   leds.begin();
