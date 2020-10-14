@@ -107,6 +107,7 @@ void handle_status()
   response += "id=\"" + unitId + "\"\n";
   response += "uptime=\"" + String(now) + "\"\n";
   response += "free heap=\"" + String(ESP.getFreeHeap()) + "\"\n";
+  response += "RSSI=\"" + String(WiFi.RSSI()) + "\"\n";
 
   server.send(200, "text/plain", response);
 
