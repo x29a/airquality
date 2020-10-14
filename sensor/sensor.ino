@@ -357,7 +357,10 @@ void loop()
         Serial.println("softreset command failed or no effect, restarting MCU");
         ESP.restart();
       }
-      delay(5000);
+      // can't do long delays with the wifi enabled,
+      // so just make sure we wait long enough (5s) before the next measurement
+      last_measurement = now + 5;
+      return;
     }
 
     // got valid readings, mark this as last measurement
