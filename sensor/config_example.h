@@ -46,3 +46,5 @@ const int sdaPin = D2;
 #define BASELINE_DELAY 3600
 // number of seconds before uploading the current values to the internet
 #define UPLOAD_DELAY 60
+// SPIFFS filename for baselines
+const char* spiffs_baseline = "/baseline.dat";

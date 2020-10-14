@@ -119,11 +119,14 @@ void handle_restart()
   ESP.restart();
 }
 
-// webserver reset handler - wipes flash and performs mc restart
+// webserver reset handler - wipes baselines, softresets sensor and performs mc restart
 void handle_reset()
 {
-  SPIFFS.format();
-  delay(30000);
+  server.send(200, "text/plain", "reset initiated");
+  // reset sensor
+  sgp.softReset();
+  // reset baselines
+  SPIFFS.remove(spiffs_baseline);
   ESP.restart();
 }
 
@@ -231,7 +234,7 @@ void setup()
   SPIFFS.begin();
 
   // reading baseline measurement from before
-  File f = SPIFFS.open("/baseline.dat", "r");
+  File f = SPIFFS.open(spiffs_baseline, "r");
   if (!f)
   {
     Serial.println("file read open failed");
@@ -395,7 +398,7 @@ void loop()
       Serial.print("****Baseline values: eCO2: 0x"); Serial.print(eCO2_base, HEX);
       Serial.print(" & TVOC: 0x"); Serial.println(TVOC_base, HEX);
 
-      File f = SPIFFS.open("/baseline.dat", "w");
+      File f = SPIFFS.open(spiffs_baseline, "w");
       if (!f)
       {
         Serial.println("file write open failed");
