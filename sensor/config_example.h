@@ -11,11 +11,11 @@ const char* wifi_passwort = "wifiPASSWORD";
 
 // endpoint configuration
 // protocol to use
-String endpointProto = "http://";
+String endpointProto = "https://";
 // host of endpoint
 const char* endpointHost = "server.tld";
 // port of endpoint
-const int endpointPort = 80;
+const int endpointPort = 443;
 // url of endpoint
 String endpointUrl = "/airquality/api/";
 
