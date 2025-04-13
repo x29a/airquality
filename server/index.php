@@ -8,6 +8,7 @@ $db = new SQLite3($filenameDB, SQLITE3_OPEN_READWRITE);
 $db->enableExceptions(true);
 
 $db->query('CREATE TABLE IF NOT EXISTS sensor_values (timestamp TEXT, sensorIP TEXT, sensorID TEXT, data TEXT);');
+$db->query('CREATE INDEX IF NOT EXISTS values_idx ON sensor_values (sensorID, timestamp);');
 
 if(isset($_POST) && !empty($_POST))
 {
