@@ -17,6 +17,7 @@ ESP8266WebServer server(80);
 #include <ESP8266HTTPUpdateServer.h>
 ESP8266HTTPUpdateServer httpUpdater;
 #include <ESP8266HTTPClient.h>
+#include <WiFiClientSecureBearSSL.h>
 
 #ifdef OUTPUT_LEDS
 #include <Adafruit_NeoPixel.h>
@@ -133,15 +134,11 @@ void handle_reset()
 }
 
 // send data to server endpoint
-int send_data_to_server()
-{
-  // check if connection is possible at all
-  WiFiClient client;
-  if (!client.connect(endpointHost, endpointPort))
-  {
-    Serial.println("connection failed");
-    return 0;
-  }
+int send_data_to_server() {
+  std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+
+  // Ignore SSL certificate validation
+  client->setInsecure();
 
   Serial.print("Requesting: ");
   Serial.println(endpointAddress);
@@ -158,19 +155,21 @@ int send_data_to_server()
   postData += "&absHum=" + String(current_abshum);
 
   // perform http post
-  HTTPClient http;
-  http.begin(endpointAddress);
-  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-  auto httpCode = http.POST(postData);
-  Serial.println(httpCode);
-  String payload = http.getString();
-  Serial.println(payload);
-  http.end();
-  Serial.println("closing connection");
+  HTTPClient https;
+  if (https.begin(*client, endpointAddress)) {
+    https.addHeader("Content-Type", "application/x-www-form-urlencoded");
+    auto httpCode = https.POST(postData);
+    Serial.println(httpCode);
+    String payload = https.getString();
+    Serial.println(payload);
+    https.end();
+    Serial.println("closing connection");
 
-  if (httpCode != 200)
-  {
-    return 0;
+    if (httpCode != 200) {
+      return 0;
+    }
+  } else {
+    Serial.printf("[HTTPS] Unable to connect\n");
   }
 
   return 1;
